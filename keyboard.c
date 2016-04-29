@@ -35,6 +35,7 @@
  */
 
 #include "keyboard.h"
+#include "matrix.h"
 
 /** Buffer to hold the previously generated Keyboard HID report, for comparison purposes inside the HID class driver. */
 static uint8_t PrevKeyboardHIDReportBuffer[sizeof(USB_KeyboardReport_Data_t)];
@@ -72,6 +73,7 @@ int main(void)
 
 	for (;;)
 	{
+    matrix_scan();
 		HID_Device_USBTask(&Keyboard_HID_Interface);
 		USB_USBTask();
 	}
@@ -100,10 +102,12 @@ void SetupHardware()
 #endif
 
 	/* Hardware Initialization */
-	Joystick_Init();
+	//Joystick_Init();
 	LEDs_Init();
-	Buttons_Init();
+	//Buttons_Init();
 	USB_Init();
+
+  matrix_initialize();
 }
 
 /** Event handler for the library USB Connection event. */
@@ -160,6 +164,7 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
 {
 	USB_KeyboardReport_Data_t* KeyboardReport = (USB_KeyboardReport_Data_t*)ReportData;
 
+  /*
 	uint8_t JoyStatus_LCL    = Joystick_GetStatus();
 	uint8_t ButtonStatus_LCL = Buttons_GetStatus();
 
@@ -183,6 +188,13 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
 
 	if (UsedKeyCodes)
     KeyboardReport->Modifier = HID_KEYBOARD_MODIFIER_LEFTSHIFT;
+  */
+
+  const uint8_t row = 2;
+  const uint8_t col = 1;
+  if (matrix_switch_pressed_at(row, col))
+    KeyboardReport->KeyCode[0] = HID_KEYBOARD_SC_A;
+
 
 	*ReportSize = sizeof(USB_KeyboardReport_Data_t);
 	return false;
