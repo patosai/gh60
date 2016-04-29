@@ -1,5 +1,4 @@
-/*
-             LUFA Library
+/* LUFA Library
      Copyright (C) Dean Camera, 2015.
 
   dean [at] fourwalledcubicle [dot] com
@@ -35,7 +34,10 @@
  */
 
 #include "keyboard.h"
+#include "keymap.h"
 #include "matrix.h"
+
+#include "keycodes.h"
 
 /** Buffer to hold the previously generated Keyboard HID report, for comparison purposes inside the HID class driver. */
 static uint8_t PrevKeyboardHIDReportBuffer[sizeof(USB_KeyboardReport_Data_t)];
@@ -164,37 +166,20 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
 {
   USB_KeyboardReport_Data_t* KeyboardReport = (USB_KeyboardReport_Data_t*)ReportData;
 
-  /*
-  uint8_t JoyStatus_LCL    = Joystick_GetStatus();
-  uint8_t ButtonStatus_LCL = Buttons_GetStatus();
+  uint8_t used_keycodes = 0;
+  const uint8_t max_keycodes = 6;
+  matrix_row_t row = 0;
+  matrix_row_t col = 0;
 
-  uint8_t UsedKeyCodes = 0;
-
-  if (JoyStatus_LCL & JOY_UP)
-    KeyboardReport->KeyCode[UsedKeyCodes++] = HID_KEYBOARD_SC_A;
-  else if (JoyStatus_LCL & JOY_DOWN)
-    KeyboardReport->KeyCode[UsedKeyCodes++] = HID_KEYBOARD_SC_B;
-
-  if (JoyStatus_LCL & JOY_LEFT)
-    KeyboardReport->KeyCode[UsedKeyCodes++] = HID_KEYBOARD_SC_C;
-  else if (JoyStatus_LCL & JOY_RIGHT)
-    KeyboardReport->KeyCode[UsedKeyCodes++] = HID_KEYBOARD_SC_D;
-
-  if (JoyStatus_LCL & JOY_PRESS)
-    KeyboardReport->KeyCode[UsedKeyCodes++] = HID_KEYBOARD_SC_E;
-
-  if (ButtonStatus_LCL & BUTTONS_BUTTON1)
-    KeyboardReport->KeyCode[UsedKeyCodes++] = HID_KEYBOARD_SC_F;
-
-  if (UsedKeyCodes)
-    KeyboardReport->Modifier = HID_KEYBOARD_MODIFIER_LEFTSHIFT;
-  */
-
-  const uint8_t row = 2;
-  const uint8_t col = 1;
-  if (matrix_switch_pressed_at(row, col))
-    KeyboardReport->KeyCode[0] = HID_KEYBOARD_SC_A;
-
+  for (row = 0; row < MATRIX_ROWS && used_keycodes < max_keycodes; ++row) {
+    for (col = 0; col < MATRIX_COLS && used_keycodes < max_keycodes; ++col) {
+      if (matrix_switch_pressed_at(row, col)) {
+        KeyboardReport->KeyCode[used_keycodes] = keymap_key_at(row, col);
+        //KeyboardReport->KeyCode[used_keycodes] = 0x1C;
+        ++used_keycodes;
+      }
+    }
+  }
 
   *ReportSize = sizeof(USB_KeyboardReport_Data_t);
   return false;

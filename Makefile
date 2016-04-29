@@ -23,8 +23,16 @@ LUFA_PATH    = ./LUFA
 CC_FLAGS     = -DUSE_LUFA_CONFIG_HEADER -IConfig/ -Iinclude/
 LD_FLAGS     =
 
+DFU          = dfu-programmer $(MCU)
+
 # Default target
 all:
+
+flash:
+	$(DFU) erase; $(DFU) flash $(TARGET).hex
+
+launch:
+	$(DFU) launch
 
 # Include LUFA build script makefiles
 include $(LUFA_PATH)/Build/lufa_core.mk

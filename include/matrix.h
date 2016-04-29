@@ -1,6 +1,7 @@
 #ifndef _MATRIX_H_
 #define _MATRIX_H_
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #define MATRIX_ROWS 5
