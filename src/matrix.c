@@ -40,7 +40,7 @@ void matrix_scan(void)
   uint8_t i;
   for (i = 0; i < MATRIX_ROWS; ++i) {
     select_row(i);
-    _delay_us(50);
+    _delay_us(500);
     matrix_state[i] = read_cols();
     unselect_rows();
   }

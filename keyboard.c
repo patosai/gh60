@@ -70,11 +70,10 @@ int main(void)
 {
   SetupHardware();
 
-  LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
+  //LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
   GlobalInterruptEnable();
 
-  for (;;)
-  {
+  while (true) {
     matrix_scan();
     HID_Device_USBTask(&Keyboard_HID_Interface);
     USB_USBTask();
@@ -115,13 +114,13 @@ void SetupHardware()
 /** Event handler for the library USB Connection event. */
 void EVENT_USB_Device_Connect(void)
 {
-  LEDs_SetAllLEDs(LEDMASK_USB_ENUMERATING);
+  //LEDs_SetAllLEDs(LEDMASK_USB_ENUMERATING);
 }
 
 /** Event handler for the library USB Disconnection event. */
 void EVENT_USB_Device_Disconnect(void)
 {
-  LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
+  //LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
 }
 
 /** Event handler for the library USB Configuration Changed event. */
@@ -133,7 +132,7 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 
   USB_Device_EnableSOFEvents();
 
-  LEDs_SetAllLEDs(ConfigSuccess ? LEDMASK_USB_READY : LEDMASK_USB_ERROR);
+  //LEDs_SetAllLEDs(ConfigSuccess ? LEDMASK_USB_READY : LEDMASK_USB_ERROR);
 }
 
 /** Event handler for the library USB Control Request reception event. */
@@ -175,7 +174,6 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
     for (col = 0; col < MATRIX_COLS && used_keycodes < max_keycodes; ++col) {
       if (matrix_switch_pressed_at(row, col)) {
         KeyboardReport->KeyCode[used_keycodes] = keymap_key_at(row, col);
-        //KeyboardReport->KeyCode[used_keycodes] = 0x1C;
         ++used_keycodes;
       }
     }
@@ -199,6 +197,7 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
                                           const void* ReportData,
                                           const uint16_t ReportSize)
 {
+  /*
   uint8_t  LEDMask   = LEDS_NO_LEDS;
   uint8_t* LEDReport = (uint8_t*)ReportData;
 
@@ -212,5 +211,6 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
     LEDMask |= LEDS_LED4;
 
   LEDs_SetAllLEDs(LEDMask);
+  */
 }
 
