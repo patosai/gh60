@@ -1,40 +1,6 @@
-/* LUFA Library
-     Copyright (C) Dean Camera, 2015.
-
-  dean [at] fourwalledcubicle [dot] com
-           www.lufa-lib.org
-*/
-
-/*
-  Copyright 2015  Dean Camera (dean [at] fourwalledcubicle [dot] com)
-
-  Permission to use, copy, modify, distribute, and sell this
-  software and its documentation for any purpose is hereby granted
-  without fee, provided that the above copyright notice appear in
-  all copies and that both that the copyright notice and this
-  permission notice and warranty disclaimer appear in supporting
-  documentation, and that the name of the author not be used in
-  advertising or publicity pertaining to distribution of the
-  software without specific, written prior permission.
-
-  The author disclaims all warranties with regard to this
-  software, including all implied warranties of merchantability
-  and fitness.  In no event shall the author be liable for any
-  special, indirect or consequential damages or any damages
-  whatsoever resulting from loss of use, data or profits, whether
-  in an action of contract, negligence or other tortious action,
-  arising out of or in connection with the use or performance of
-  this software.
-*/
-
-/** \file
- *
- *  Main source file for the Keyboard demo. This file contains the main tasks of
- *  the demo and is responsible for the initial application hardware configuration.
- */
-
 #include "keyboard.h"
 #include "keymap.h"
+#include "led.h"
 #include "matrix.h"
 
 #include "keycodes.h"
@@ -69,9 +35,10 @@ USB_ClassInfo_HID_Device_t Keyboard_HID_Interface =
 int main(void)
 {
   SetupHardware();
-
-  //LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
   GlobalInterruptEnable();
+
+  led_caps_lock_on();
+  led_backlight_on();
 
   while (true) {
     matrix_scan();
@@ -102,13 +69,8 @@ void SetupHardware()
   PMIC.CTRL = PMIC_LOLVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_HILVLEN_bm;
 #endif
 
-  /* Hardware Initialization */
-  //Joystick_Init();
-  LEDs_Init();
-  //Buttons_Init();
-  USB_Init();
-
   matrix_initialize();
+  USB_Init();
 }
 
 /** Event handler for the library USB Connection event. */
