@@ -21,11 +21,11 @@ void led_caps_lock_off(void) {
 void led_backlight_on(void) {
   DDRB |= (1<<PB6);
 
-  TCCR1A |= ((1<<WGM10)    // 8 bit fast PWM
-            | (1<<COM1A1)  // Clear OC1A on compare match, clear them at bottom 
-            | (1<<COM1B1));  //Clear OC1B on compare match, clear them at bottom 
-  TCCR1B= ((1<<WGM12) // 8 bit fast PWM  
-            | (1<<CS11));   // 1/8 prescale
+  TCCR1A |= ((1<<WGM10)        // 8 bit fast PWM
+              | (1<<COM1A1)    // Clear OC1A on compare match, clear them at bottom
+              | (1<<COM1B1));  //Clear OC1B on compare match, clear them at bottom
+  TCCR1B |= ((1<<WGM12)        // 8 bit fast PWM
+              | (1<<CS11));    // 1/8 prescale
 
   OCR1B = 255;
 }

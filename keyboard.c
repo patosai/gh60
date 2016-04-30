@@ -3,8 +3,6 @@
 #include "led.h"
 #include "matrix.h"
 
-#include "keycodes.h"
-
 /** Buffer to hold the previously generated Keyboard HID report, for comparison purposes inside the HID class driver. */
 static uint8_t PrevKeyboardHIDReportBuffer[sizeof(USB_KeyboardReport_Data_t)];
 
@@ -37,7 +35,6 @@ int main(void)
   SetupHardware();
   GlobalInterruptEnable();
 
-  led_caps_lock_on();
   led_backlight_on();
 
   while (true) {
@@ -159,10 +156,10 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
                                           const void* ReportData,
                                           const uint16_t ReportSize)
 {
-  /*
   uint8_t  LEDMask   = LEDS_NO_LEDS;
   uint8_t* LEDReport = (uint8_t*)ReportData;
 
+  /*
   if (*LEDReport & HID_KEYBOARD_LED_NUMLOCK)
     LEDMask |= LEDS_LED1;
 
@@ -171,8 +168,13 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
 
   if (*LEDReport & HID_KEYBOARD_LED_SCROLLLOCK)
     LEDMask |= LEDS_LED4;
-
-  LEDs_SetAllLEDs(LEDMask);
   */
+  if (*LEDReport & HID_KEYBOARD_LED_CAPSLOCK) {
+    led_caps_lock_on();
+  } else {
+    led_caps_lock_off();
+  }
+
+  //LEDs_SetAllLEDs(LEDMask);
 }
 
