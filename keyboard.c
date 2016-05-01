@@ -3,6 +3,8 @@
 #include "led.h"
 #include "matrix.h"
 
+#define MAX_KEYCODES 6
+
 /** Buffer to hold the previously generated Keyboard HID report, for comparison purposes inside the HID class driver. */
 static uint8_t PrevKeyboardHIDReportBuffer[sizeof(USB_KeyboardReport_Data_t)];
 
@@ -32,10 +34,9 @@ USB_ClassInfo_HID_Device_t Keyboard_HID_Interface =
  */
 int main(void)
 {
-  SetupHardware();
   GlobalInterruptEnable();
 
-  led_backlight_on();
+  initialize_hardware();
 
   while (true) {
     matrix_scan();
@@ -45,7 +46,7 @@ int main(void)
 }
 
 /** Configures the board hardware and chip peripherals for the demo's functionality. */
-void SetupHardware()
+void initialize_hardware()
 {
 #if (ARCH == ARCH_AVR8)
   /* Disable watchdog if enabled by bootloader/fuses */
@@ -70,16 +71,47 @@ void SetupHardware()
   USB_Init();
 }
 
+void fill_keyboard_report(USB_KeyboardReport_Data_t* keyboardReport) {
+  uint8_t used_keycodes = 0;
+  matrix_row_t row = 0;
+  matrix_row_t col = 0;
+
+  for (row = 0; row < MATRIX_ROWS && used_keycodes < MAX_KEYCODES; ++row) {
+    for (col = 0; col < MATRIX_COLS && used_keycodes < MAX_KEYCODES; ++col) {
+      if (matrix_switch_pressed_at(row, col)) {
+        keycode_t key = keymap_key_at(row, col);
+
+        check_for_layer_change_command(key);
+
+        if (key_is_modifier(key)) {
+          keyboardReport->Modifier |= key_to_modifier(key);
+        } else {
+          keyboardReport->KeyCode[used_keycodes] = key;
+          ++used_keycodes;
+        }
+      }
+    }
+  }
+}
+
+void check_for_layer_change_command(keycode_t key) {
+  if (key_is_layer_command(key)) {
+    uint8_t layer = key_layer_to_num(key);
+    keymap_set_current_layer(layer);
+    led_backlight_blink(layer);
+  }
+}
+
 /** Event handler for the library USB Connection event. */
 void EVENT_USB_Device_Connect(void)
 {
-  //LEDs_SetAllLEDs(LEDMASK_USB_ENUMERATING);
+  led_backlight_on();
 }
 
 /** Event handler for the library USB Disconnection event. */
 void EVENT_USB_Device_Disconnect(void)
 {
-  //LEDs_SetAllLEDs(LEDMASK_USB_NOTREADY);
+  led_backlight_off();
 }
 
 /** Event handler for the library USB Configuration Changed event. */
@@ -90,8 +122,6 @@ void EVENT_USB_Device_ConfigurationChanged(void)
   ConfigSuccess &= HID_Device_ConfigureEndpoints(&Keyboard_HID_Interface);
 
   USB_Device_EnableSOFEvents();
-
-  //LEDs_SetAllLEDs(ConfigSuccess ? LEDMASK_USB_READY : LEDMASK_USB_ERROR);
 }
 
 /** Event handler for the library USB Control Request reception event. */
@@ -122,27 +152,9 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
                                          void* ReportData,
                                          uint16_t* const ReportSize)
 {
-  USB_KeyboardReport_Data_t* KeyboardReport = (USB_KeyboardReport_Data_t*)ReportData;
+  USB_KeyboardReport_Data_t* keyboardReport = (USB_KeyboardReport_Data_t*)ReportData;
 
-  uint8_t used_keycodes = 0;
-  const uint8_t max_keycodes = 6;
-  matrix_row_t row = 0;
-  matrix_row_t col = 0;
-
-  for (row = 0; row < MATRIX_ROWS && used_keycodes < max_keycodes; ++row) {
-    for (col = 0; col < MATRIX_COLS && used_keycodes < max_keycodes; ++col) {
-      if (matrix_switch_pressed_at(row, col)) {
-        keycode_t key = keymap_key_at(row, col);
-
-        if (key_is_modifier(key)) {
-          KeyboardReport->Modifier |= key_to_modifier(key);         
-        } else {
-          KeyboardReport->KeyCode[used_keycodes] = key;
-          ++used_keycodes;
-        }
-      }
-    }
-  }
+  fill_keyboard_report(keyboardReport);
 
   *ReportSize = sizeof(USB_KeyboardReport_Data_t);
   return false;
@@ -162,25 +174,12 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
                                           const void* ReportData,
                                           const uint16_t ReportSize)
 {
-  uint8_t  LEDMask   = LEDS_NO_LEDS;
   uint8_t* LEDReport = (uint8_t*)ReportData;
 
-  /*
-  if (*LEDReport & HID_KEYBOARD_LED_NUMLOCK)
-    LEDMask |= LEDS_LED1;
-
-  if (*LEDReport & HID_KEYBOARD_LED_CAPSLOCK)
-    LEDMask |= LEDS_LED3;
-
-  if (*LEDReport & HID_KEYBOARD_LED_SCROLLLOCK)
-    LEDMask |= LEDS_LED4;
-  */
   if (*LEDReport & HID_KEYBOARD_LED_CAPSLOCK) {
     led_caps_lock_on();
   } else {
     led_caps_lock_off();
   }
-
-  //LEDs_SetAllLEDs(LEDMask);
 }
 

@@ -8,6 +8,7 @@ typedef uint8_t keycode_t;
 
 bool key_is_modifier(keycode_t key);
 keycode_t key_to_modifier(keycode_t key);
+bool key_is_layer_command(keycode_t key);
 
 /* Modifiers */
 #define KC_LCTRL  0xE0
@@ -19,7 +20,7 @@ keycode_t key_to_modifier(keycode_t key);
 #define KC_RALT   0xE6
 #define KC_RGUI   0xE7
 
-/* Modifiers - internal used internally */
+/* Modifiers - used internally */
 #define MOD_LCTRL  (1 << 0)
 #define MOD_LSHIFT (1 << 1)
 #define MOD_LALT   (1 << 2)
@@ -260,5 +261,11 @@ keycode_t key_to_modifier(keycode_t key);
 #define KC_MEDIA_LOCK                        0xF9
 #define KC_MEDIA_RELOAD                      0xFA
 #define KC_MEDIA_CALCULATOR                  0xFB
+
+/* Custom layer switching */
+#define KC_LAYER_0 0xFC
+#define KC_LAYER_1 0xFD
+#define KC_LAYER_2 0xFE
+#define KC_LAYER_3 0xFF
 
 #endif
