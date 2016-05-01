@@ -9,6 +9,6 @@ void led_caps_lock_off(void);
 void led_backlight_on(void);
 void led_backlight_off(void);
 
-void led_backlight_blink(uint8_t num_times);
+void led_backlight_blink(void);
 
 #endif

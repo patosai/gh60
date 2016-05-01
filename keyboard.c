@@ -98,7 +98,7 @@ void check_for_layer_change_command(keycode_t key) {
   if (key_is_layer_command(key)) {
     uint8_t layer = key_layer_to_num(key);
     keymap_set_current_layer(layer);
-    led_backlight_blink(layer);
+    led_backlight_blink();
   }
 }
 

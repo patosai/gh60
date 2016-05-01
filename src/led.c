@@ -37,12 +37,10 @@ void led_backlight_off(void) {
   PORTB |= (1<<PB6);
 }
 
-void led_backlight_blink(uint8_t num_times) {
-  const uint8_t delay = 250;
-  for (uint8_t i = 0; i < num_times; ++i) {
-    led_backlight_off();
-    _delay_ms(delay);
-    led_backlight_on();
-    _delay_ms(delay);
-  }
+void led_backlight_blink(void) {
+  const double delay_ms = 500;
+  led_backlight_off();
+  _delay_ms(delay_ms);
+  led_backlight_on();
+  _delay_ms(delay_ms);
 }
