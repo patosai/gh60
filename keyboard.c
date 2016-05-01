@@ -132,8 +132,14 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
   for (row = 0; row < MATRIX_ROWS && used_keycodes < max_keycodes; ++row) {
     for (col = 0; col < MATRIX_COLS && used_keycodes < max_keycodes; ++col) {
       if (matrix_switch_pressed_at(row, col)) {
-        KeyboardReport->KeyCode[used_keycodes] = keymap_key_at(row, col);
-        ++used_keycodes;
+        keycode_t key = keymap_key_at(row, col);
+
+        if (key_is_modifier(key)) {
+          KeyboardReport->Modifier |= key_to_modifier(key);         
+        } else {
+          KeyboardReport->KeyCode[used_keycodes] = key;
+          ++used_keycodes;
+        }
       }
     }
   }

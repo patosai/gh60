@@ -1,20 +1,15 @@
 #ifndef _KEYCODES_H_
 #define _KEYCODES_H_
 
+#include <stdbool.h>
 #include <stdint.h>
 
 typedef uint8_t keycode_t;
 
-/* Modifiers */
-#define MOD_LCTRL  (1 << 0)
-#define MOD_LSHIFT (1 << 1)
-#define MOD_LALT   (1 << 2)
-#define MOD_LGUI   (1 << 3)
-#define MOD_RCTRL  (1 << 4)
-#define MOD_RSHIFT (1 << 5)
-#define MOD_RALT   (1 << 6)
-#define MOD_RGUI   (1 << 7)
+bool key_is_modifier(keycode_t key);
+keycode_t key_to_modifier(keycode_t key);
 
+/* Modifiers */
 #define KC_LCTRL  0xE0
 #define KC_LSHIFT 0xE1
 #define KC_LALT   0xE2
@@ -23,6 +18,16 @@ typedef uint8_t keycode_t;
 #define KC_RSHIFT 0xE5
 #define KC_RALT   0xE6
 #define KC_RGUI   0xE7
+
+/* Modifiers - internal used internally */
+#define MOD_LCTRL  (1 << 0)
+#define MOD_LSHIFT (1 << 1)
+#define MOD_LALT   (1 << 2)
+#define MOD_LGUI   (1 << 3)
+#define MOD_RCTRL  (1 << 4)
+#define MOD_RSHIFT (1 << 5)
+#define MOD_RALT   (1 << 6)
+#define MOD_RGUI   (1 << 7)
 
 /* Keys */
 #define KC_NONE           0x00 // Reserved (no event indicated)
