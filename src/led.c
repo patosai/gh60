@@ -38,7 +38,7 @@ void led_backlight_off(void) {
 }
 
 void led_backlight_blink(void) {
-  const double delay_ms = 500;
+  const double delay_ms = 250;
   led_backlight_off();
   _delay_ms(delay_ms);
   led_backlight_on();
