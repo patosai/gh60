@@ -4,7 +4,7 @@
 #include "matrix.h"
 
 #ifdef DEBOUNCE_ENABLED
-#define DEBOUNCE_AMOUNT 12
+#define DEBOUNCE_AMOUNT 15
 #endif
 
 
