@@ -4,7 +4,7 @@
 #include "matrix.h"
 
 #ifdef DEBOUNCE_ENABLED
-#define DEBOUNCE_AMOUNT 15
+#define DEBOUNCE_AMOUNT 5
 #endif
 
 
@@ -21,7 +21,7 @@ static matrix_row_t matrix_state[MATRIX_ROWS];
 
 #ifdef DEBOUNCE_ENABLED
 static matrix_row_t matrix_debounced_state[MATRIX_ROWS];
-static uint8_t matrix_debounce_counter[MATRIX_ROWS][MATRIX_COLS];
+static uint8_t matrix_debounce_counter;
 #endif
 
 void matrix_initialize(void)
@@ -34,9 +34,7 @@ void matrix_initialize(void)
     matrix_state[i] = 0;
 #ifdef DEBOUNCE_ENABLED
     matrix_debounced_state[i] = 0;
-    for (j = 0; j < MATRIX_COLS; ++j) {
-      matrix_debounce_counter[i][j] = 0;
-    }
+    matrix_debounce_counter = DEBOUNCE_AMOUNT;
 #endif
   }
 }
@@ -58,38 +56,31 @@ bool matrix_switch_pressed_at(uint8_t row_num, uint8_t col_num)
 void matrix_scan(void)
 {
   uint8_t i;
-#ifdef DEBOUNCE_ENABLED
-  uint8_t j;
-  matrix_row_t keyOn, keyPreviouslyOn;
-#endif
 
   for (i = 0; i < MATRIX_ROWS; ++i) {
     select_row(i);
     _delay_us(500);
-    matrix_state[i] = read_cols();
+    matrix_row_t row = read_cols();
+    matrix_state[i] = row;
     unselect_rows();
 
 #ifdef DEBOUNCE_ENABLED
-    for (j = 0; j < MATRIX_COLS; ++j) {
-      keyOn = matrix_state[i] & (1 << j);
-      keyPreviouslyOn = matrix_debounced_state[i] & (1 << j);
-      if (keyOn != keyPreviouslyOn) {
-        if (matrix_debounce_counter[i][j] > 0) {
-          --matrix_debounce_counter[i][j];
-        } else {
-          matrix_debounce_counter[i][j] = DEBOUNCE_AMOUNT;
-          if (keyPreviouslyOn) {
-            matrix_debounced_state[i] &= keyOn;
-          } else {
-            matrix_debounced_state[i] |= keyOn;
-          }
-        }
-      } else {
-        matrix_debounce_counter[i][j] = DEBOUNCE_AMOUNT;
-      }
+    if (matrix_state[i] != row) {
+      matrix_debounce_counter = DEBOUNCE_AMOUNT;
     }
 #endif
   }
+
+#ifdef DEBOUNCE_ENABLED
+  if (matrix_debounce_counter) {
+    --matrix_debounce_counter;
+    _delay_ms(1);
+  } else {
+    for (i = 0; i < MATRIX_ROWS; ++i) {
+      matrix_debounced_state[i] = matrix_state[i];
+    }
+  }
+#endif
 }
 
 /* Column pin configuration
