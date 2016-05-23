@@ -3,6 +3,11 @@
 
 #include "matrix.h"
 
+#ifdef DEBOUNCE_ENABLED
+#define DEBOUNCE_AMOUNT 5
+#endif
+
+
 static void         init_cols(void);
 static matrix_row_t read_cols(void);
 static void         select_row(uint8_t row);
@@ -14,6 +19,11 @@ static void         unselect_rows(void);
  */
 static matrix_row_t matrix_state[MATRIX_ROWS];
 
+#ifdef DEBOUNCE_ENABLED
+static matrix_row_t matrix_debounced_state[MATRIX_ROWS];
+static uint8_t matrix_debounce_counter;
+#endif
+
 void matrix_initialize(void)
 {
   unselect_rows();
@@ -22,6 +32,10 @@ void matrix_initialize(void)
   uint8_t i;
   for (i = 0; i < MATRIX_ROWS; ++i) {
     matrix_state[i] = 0;
+#ifdef DEBOUNCE_ENABLED
+    matrix_debounced_state[i] = 0;
+    matrix_debounce_counter = DEBOUNCE_AMOUNT;
+#endif
   }
 }
 
@@ -38,12 +52,31 @@ bool matrix_switch_pressed_at(uint8_t row_num, uint8_t col_num)
 void matrix_scan(void)
 {
   uint8_t i;
+
   for (i = 0; i < MATRIX_ROWS; ++i) {
     select_row(i);
     _delay_us(500);
-    matrix_state[i] = read_cols();
+    matrix_row_t row = read_cols();
+    matrix_state[i] = row;
     unselect_rows();
+
+#ifdef DEBOUNCE_ENABLED
+    if (matrix_state[i] != row) {
+      matrix_debounce_counter = DEBOUNCE_AMOUNT;
+    }
+#endif
   }
+
+#ifdef DEBOUNCE_ENABLED
+  if (matrix_debounce_counter) {
+    --matrix_debounce_counter;
+    _delay_ms(1);
+  } else {
+    for (i = 0; i < MATRIX_ROWS; ++i) {
+      matrix_debounced_state[i] = matrix_state[i];
+    }
+  }
+#endif
 }
 
 /* Column pin configuration
