@@ -3,6 +3,11 @@
 
 #include "matrix.h"
 
+#ifdef DEBOUNCE_ENABLED
+#define DEBOUNCE_AMOUNT 5
+#endif
+
+
 static void         init_cols(void);
 static matrix_row_t read_cols(void);
 static void         select_row(uint8_t row);
@@ -14,35 +19,76 @@ static void         unselect_rows(void);
  */
 static matrix_row_t matrix_state[MATRIX_ROWS];
 
+#ifdef DEBOUNCE_ENABLED
+static matrix_row_t matrix_debounced_state[MATRIX_ROWS];
+static uint8_t matrix_debounce_counter[MATRIX_ROWS][MATRIX_COLS];
+#endif
+
 void matrix_initialize(void)
 {
   unselect_rows();
   init_cols();
 
-  uint8_t i;
+  uint8_t i, j;
   for (i = 0; i < MATRIX_ROWS; ++i) {
     matrix_state[i] = 0;
+#ifdef DEBOUNCE_ENABLED
+    matrix_debounced_state[i] = 0;
+    for (j = 0; j < MATRIX_COLS; ++j) {
+      matrix_debounce_counter[i][j] = 0;
+    }
+#endif
   }
 }
 
 matrix_row_t matrix_get_row(uint8_t row_num)
 {
+#ifdef DEBOUNCE_ENABLED
+  return matrix_debounced_state[row_num];
+#else
   return matrix_state[row_num];
+#endif
 }
 
 bool matrix_switch_pressed_at(uint8_t row_num, uint8_t col_num)
 {
-  return matrix_state[row_num] & (1 << col_num);
+  return matrix_get_row(row_num) & (1 << col_num);
 }
 
 void matrix_scan(void)
 {
   uint8_t i;
+#ifdef DEBOUNCE_ENABLED
+  uint8_t j;
+  matrix_row_t keyOn, keyPreviouslyOn;
+#endif
+
   for (i = 0; i < MATRIX_ROWS; ++i) {
     select_row(i);
     _delay_us(500);
     matrix_state[i] = read_cols();
     unselect_rows();
+
+#ifdef DEBOUNCE_ENABLED
+    for (j = 0; j < MATRIX_COLS; ++j) {
+      keyOn = matrix_state[i] & (1 << j);
+      keyPreviouslyOn = matrix_debounced_state[i] & (1 << j);
+      if (keyOn != keyPreviouslyOn) {
+        if (matrix_debounce_counter[i][j] > 0) {
+          --matrix_debounce_counter[i][j];
+        } else {
+          matrix_debounce_counter[i][j] = DEBOUNCE_AMOUNT;
+          if (keyPreviouslyOn) {
+            matrix_debounced_state[i] &= keyOn;
+          } else {
+            matrix_debounced_state[i] |= keyOn;
+          }
+        }
+      } else {
+        matrix_debounce_counter[i][j] = DEBOUNCE_AMOUNT;
+      }
+    }
+#endif
   }
 }
 

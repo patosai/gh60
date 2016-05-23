@@ -5,7 +5,7 @@ This is a custom firmware for the GH60 Satan. It uses the LUFA USB stack so you 
 ### Features
 * LED support (for my version, it's basically Caps Lock and everything else)
 * Layers (up to 4)
-* No debouncing (haven't run into those problems yet)
+* Debouncing
 
 ## Building
 `make`
@@ -13,7 +13,7 @@ This is a custom firmware for the GH60 Satan. It uses the LUFA USB stack so you 
 You will need to have avr-gcc.
 
 ## Flashing to the board
-Now I hope you flashed the LUFA DFU bootloader. I use `dfu-programmer` to upload the firmware; make sure you have that.
+Again, this firmware uses the LUFA USB stack so make sure you've got the LUFA bootloader on your atmega.
 
-`make flash` will do everything for you after you build the project. Takes like 5 seconds.
-`make launch` will run the program on the board. It will boot into the program automatically unless you dun goof'd with your fuses.
+`make flash` flashes the built firmware to the board.
+`make launch` will run the program on the board. You can also just power cycle your GH60; the bootloader will automatically run the firmware unless you've changed your fuses.
