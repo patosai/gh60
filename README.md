@@ -2,6 +2,8 @@ GH60 Satan Firmware
 ====================
 This is a custom firmware for the GH60 Satan. It uses the LUFA USB stack so you need to flash the LUFA DFU bootloader hex file to your atmega32u4.
 
+Modify `src/keymap.c` to your liking. The list of all keys is in `include/keycodes.h`
+
 ### Features
 * LED support (for my version, it's basically Caps Lock and everything else)
 * Layers (up to 4)
