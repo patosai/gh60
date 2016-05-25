@@ -19,3 +19,6 @@ Again, this firmware uses the LUFA USB stack so make sure you've got the LUFA bo
 
 `make flash` flashes the built firmware to the board.
 `make launch` will run the program on the board. You can also just power cycle your GH60; the bootloader will automatically run the firmware unless you've changed your fuses.
+
+## License
+MIT
