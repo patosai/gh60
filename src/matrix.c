@@ -29,7 +29,7 @@ void matrix_initialize(void)
   unselect_rows();
   init_cols();
 
-  uint8_t i, j;
+  uint8_t i;
   for (i = 0; i < MATRIX_ROWS; ++i) {
     matrix_state[i] = 0;
 #ifdef DEBOUNCE_ENABLED
