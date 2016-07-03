@@ -20,7 +20,7 @@ OPTIMIZATION = s
 TARGET       = keyboard
 SRC          = $(TARGET).c $(wildcard src/*.c) $(LUFA_SRC_USB) $(LUFA_SRC_USBCLASS)
 LUFA_PATH    = ./LUFA
-CC_FLAGS     = -DUSE_LUFA_CONFIG_HEADER -IConfig/ -Iinclude/
+CC_FLAGS     = -DUSE_LUFA_CONFIG_HEADER -Iinclude/
 LD_FLAGS     =
 
 DFU          = dfu-programmer $(MCU)
