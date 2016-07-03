@@ -12,6 +12,6 @@ bool key_is_layer_command(keycode_t key) {
   return key >= 0xFC;
 }
 
-bool key_layer_to_num(keycode_t key) {
+uint8_t key_layer_to_num(keycode_t key) {
   return key - 0xFC;
 }

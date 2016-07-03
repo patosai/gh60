@@ -9,6 +9,7 @@ typedef uint8_t keycode_t;
 bool key_is_modifier(keycode_t key);
 keycode_t key_to_modifier(keycode_t key);
 bool key_is_layer_command(keycode_t key);
+uint8_t key_layer_to_num(keycode_t key);
 
 /* Modifiers */
 #define KC_LCTRL  0xE0
