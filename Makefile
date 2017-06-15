@@ -35,7 +35,7 @@ flash:
 	$(DFU) erase; $(DFU) flash $(TARGET).hex
 
 launch:
-	$(DFU) launch
+	$(DFU) reset
 
 # Include LUFA build script makefiles
 include $(LUFA_PATH)/Build/lufa_core.mk
