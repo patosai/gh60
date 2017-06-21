@@ -24,12 +24,15 @@ SRC          = $(TARGET).c \
                $(LUFA_SRC_USBCLASS)
 LUFA_PATH    = ./LUFA
 CC_FLAGS     = -DUSE_LUFA_CONFIG_HEADER \
+							 -DDEBOUNCE_ENABLED \
 							 -Iinclude
 LD_FLAGS     =
 
 DFU          = dfu-programmer $(MCU)
 
 all:
+
+fl: flash launch
 
 flash:
 	$(DFU) erase; $(DFU) flash $(TARGET).hex

@@ -4,7 +4,8 @@
 #include "matrix.h"
 
 #ifdef DEBOUNCE_ENABLED
-#define DEBOUNCE_AMOUNT 15
+// debounce time in milliseconds
+#define DEBOUNCE_AMOUNT 2
 #endif
 
 
@@ -61,7 +62,6 @@ void matrix_scan(void)
     select_row(i);
     _delay_us(500);
     matrix_row_t row = read_cols();
-    matrix_state[i] = row;
     unselect_rows();
 
 #ifdef DEBOUNCE_ENABLED
@@ -69,18 +69,21 @@ void matrix_scan(void)
       matrix_debounce_counter = DEBOUNCE_AMOUNT;
     }
 #endif
+
+    matrix_state[i] = row;
   }
 
 #ifdef DEBOUNCE_ENABLED
   if (matrix_debounce_counter) {
     --matrix_debounce_counter;
-    _delay_ms(1);
   } else {
     for (i = 0; i < MATRIX_ROWS; ++i) {
       matrix_debounced_state[i] = matrix_state[i];
     }
   }
 #endif
+
+  _delay_ms(1);
 }
 
 /* Column pin configuration
