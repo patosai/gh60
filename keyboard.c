@@ -32,8 +32,7 @@ USB_ClassInfo_HID_Device_t Keyboard_HID_Interface =
 /** Main program entry point. This routine contains the overall program flow, including initial
  *  setup of all components and the main program loop.
  */
-int main(void)
-{
+int main(void) {
   GlobalInterruptEnable();
 
   initialize_hardware();
@@ -46,8 +45,7 @@ int main(void)
 }
 
 /** Configures the board hardware and chip peripherals for the demo's functionality. */
-void initialize_hardware()
-{
+void initialize_hardware() {
 #if (ARCH == ARCH_AVR8)
   /* Disable watchdog if enabled by bootloader/fuses */
   MCUSR &= ~(1 << WDRF);
@@ -103,20 +101,17 @@ void check_for_layer_change_command(keycode_t key) {
 }
 
 /** Event handler for the library USB Connection event. */
-void EVENT_USB_Device_Connect(void)
-{
+void EVENT_USB_Device_Connect(void) {
   led_backlight_on();
 }
 
 /** Event handler for the library USB Disconnection event. */
-void EVENT_USB_Device_Disconnect(void)
-{
+void EVENT_USB_Device_Disconnect(void) {
   led_backlight_off();
 }
 
 /** Event handler for the library USB Configuration Changed event. */
-void EVENT_USB_Device_ConfigurationChanged(void)
-{
+void EVENT_USB_Device_ConfigurationChanged(void) {
   bool ConfigSuccess = true;
 
   ConfigSuccess &= HID_Device_ConfigureEndpoints(&Keyboard_HID_Interface);
@@ -125,14 +120,12 @@ void EVENT_USB_Device_ConfigurationChanged(void)
 }
 
 /** Event handler for the library USB Control Request reception event. */
-void EVENT_USB_Device_ControlRequest(void)
-{
+void EVENT_USB_Device_ControlRequest(void) {
   HID_Device_ProcessControlRequest(&Keyboard_HID_Interface);
 }
 
 /** Event handler for the USB device Start Of Frame event. */
-void EVENT_USB_Device_StartOfFrame(void)
-{
+void EVENT_USB_Device_StartOfFrame(void) {
   HID_Device_MillisecondElapsed(&Keyboard_HID_Interface);
 }
 
@@ -150,8 +143,7 @@ bool CALLBACK_HID_Device_CreateHIDReport(USB_ClassInfo_HID_Device_t* const HIDIn
                                          uint8_t* const ReportID,
                                          const uint8_t ReportType,
                                          void* ReportData,
-                                         uint16_t* const ReportSize)
-{
+                                         uint16_t* const ReportSize) {
   USB_KeyboardReport_Data_t* keyboardReport = (USB_KeyboardReport_Data_t*)ReportData;
 
   fill_keyboard_report(keyboardReport);
@@ -172,8 +164,7 @@ void CALLBACK_HID_Device_ProcessHIDReport(USB_ClassInfo_HID_Device_t* const HIDI
                                           const uint8_t ReportID,
                                           const uint8_t ReportType,
                                           const void* ReportData,
-                                          const uint16_t ReportSize)
-{
+                                          const uint16_t ReportSize) {
   uint8_t* LEDReport = (uint8_t*)ReportData;
 
   if (*LEDReport & HID_KEYBOARD_LED_CAPSLOCK) {

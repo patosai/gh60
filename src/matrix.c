@@ -3,11 +3,10 @@
 
 #include "matrix.h"
 
-#ifdef DEBOUNCE_ENABLED
 // debounce time in milliseconds
+#ifdef DEBOUNCE_ENABLED
 #define DEBOUNCE_AMOUNT 2
 #endif
-
 
 static void         init_cols(void);
 static matrix_row_t read_cols(void);
@@ -25,8 +24,7 @@ static matrix_row_t matrix_debounced_state[MATRIX_ROWS];
 static uint8_t matrix_debounce_counter;
 #endif
 
-void matrix_initialize(void)
-{
+void matrix_initialize(void) {
   unselect_rows();
   init_cols();
 
@@ -40,8 +38,7 @@ void matrix_initialize(void)
   }
 }
 
-matrix_row_t matrix_get_row(uint8_t row_num)
-{
+matrix_row_t matrix_get_row(uint8_t row_num) {
 #ifdef DEBOUNCE_ENABLED
   return matrix_debounced_state[row_num];
 #else
@@ -49,13 +46,11 @@ matrix_row_t matrix_get_row(uint8_t row_num)
 #endif
 }
 
-bool matrix_switch_pressed_at(uint8_t row_num, uint8_t col_num)
-{
+bool matrix_switch_pressed_at(uint8_t row_num, uint8_t col_num) {
   return matrix_get_row(row_num) & (1 << col_num);
 }
 
-void matrix_scan(void)
-{
+void matrix_scan(void) {
   uint8_t i;
 
   for (i = 0; i < MATRIX_ROWS; ++i) {
@@ -89,8 +84,7 @@ void matrix_scan(void)
 /* Column pin configuration
  * pins (sorted): F1  F0  E6  D7  D6  D4  C7  C6  B7  B5  B4  B3  B1  B0
  */
-static void init_cols(void)
-{
+static void init_cols(void) {
   // Input with pull-up(DDR:0, PORT:1)
   DDRF  &= ~(1<<PF1 | 1<<PF0);
   PORTF |=  (1<<PF1 | 1<<PF0);
@@ -109,8 +103,7 @@ static void init_cols(void)
  * pin: F0  F1  E6  C7  C6  B7  D4  B1  B0  B5  B4  D7  D6  B3  (Rev.CHN)
  * pin: F0  F1  E6  C7  C6  B7  D4  B0  B1  B5  B4  D7  D6  B3  (Rev.CNY)
  */
-static matrix_row_t read_cols(void)
-{
+static matrix_row_t read_cols(void) {
   return
     (PINF&(1<<PF0) ? 0 : (1<<0)) |
     (PINF&(1<<PF1) ? 0 : (1<<1)) |
@@ -132,8 +125,7 @@ static matrix_row_t read_cols(void)
  * row: 0   1   2   3   4
  * pin: D0  D1  D2  D3  D5
  */
-static void select_row(uint8_t row)
-{
+static void select_row(uint8_t row) {
   // Output low(DDR:1, PORT:0) to select
   switch (row) {
     case 0:
@@ -159,8 +151,7 @@ static void select_row(uint8_t row)
   }
 }
 
-static void unselect_rows(void)
-{
+static void unselect_rows(void) {
   // Hi-Z(DDR:0, PORT:0) to unselect
   DDRD  &= ~0b00101111;
   PORTD &= ~0b00101111;
