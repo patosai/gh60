@@ -50,8 +50,9 @@ bool matrix_switch_pressed_at(uint8_t row_num, uint8_t col_num) {
   return matrix_get_row(row_num) & (1 << col_num);
 }
 
-void matrix_scan(void) {
+bool matrix_scan(void) {
   uint8_t i;
+  bool keyWasPressed = false;
 
   for (i = 0; i < MATRIX_ROWS; ++i) {
     select_row(i);
@@ -65,20 +66,24 @@ void matrix_scan(void) {
     }
 #endif
 
+    keyWasPressed |= row > 0;
     matrix_state[i] = row;
   }
 
 #ifdef DEBOUNCE_ENABLED
+  keyWasPressed = false;
+
   if (matrix_debounce_counter) {
     --matrix_debounce_counter;
   } else {
     for (i = 0; i < MATRIX_ROWS; ++i) {
+      keyWasPressed |= matrix_state[i] > 0;
       matrix_debounced_state[i] = matrix_state[i];
     }
   }
 #endif
 
-  _delay_ms(1);
+  return keyWasPressed;
 }
 
 /* Column pin configuration

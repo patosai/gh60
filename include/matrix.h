@@ -34,7 +34,8 @@ bool matrix_switch_pressed_at(uint8_t row_num, uint8_t col_num);
 
 /*
  * Scan the keyboard switch matrix
+ * True if any key was pressed
  */
-void matrix_scan(void);
+bool matrix_scan(void);
 
 #endif

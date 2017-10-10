@@ -25,6 +25,7 @@ SRC          = $(TARGET).c \
 LUFA_PATH    = ./LUFA
 CC_FLAGS     = -DUSE_LUFA_CONFIG_HEADER \
 							 -DDEBOUNCE_ENABLED \
+							 -DHOST_WAKEUP_ENABLED \
 							 -Iinclude
 LD_FLAGS     =
 

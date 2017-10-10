@@ -37,10 +37,17 @@ int main(void) {
 
   initialize_hardware();
 
+  bool keyWasPressed = false;
   while (true) {
-    matrix_scan();
+    keyWasPressed = matrix_scan();
     HID_Device_USBTask(&Keyboard_HID_Interface);
     USB_USBTask();
+
+#ifdef HOST_WAKEUP_ENABLED
+    if (USB_DeviceState == DEVICE_STATE_Suspended && keyWasPressed) {
+      USB_Device_SendRemoteWakeup();
+    }
+#endif
   }
 }
 
